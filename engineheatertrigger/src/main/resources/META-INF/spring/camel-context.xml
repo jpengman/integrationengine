@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <camelContext id="camelContext-engineHeaterTrigger" xmlns="http://camel.apache.org/schema/spring">
+        <route id="engineHeaterTrigger" streamCache="true">
+            <from id="triggerTimer" uri="timer:timerName?period=30s"/>
+            <to id="RESTTrigger" uri="http4://localhost:8080/EngineHeaterTimer/rest/trigger"/>
+            <choice id="_choice1">
+                <when>
+                    <simple>${body} == true</simple>
+                    <log message="when true"/>
+                </when>
+                <otherwise>
+                    <log  message="otherwise"/>
+                </otherwise>
+            </choice>
+        </route>
+    </camelContext>
+</beans>
