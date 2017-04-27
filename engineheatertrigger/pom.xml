@@ -2,9 +2,7 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>se.anviken</groupId>
   <artifactId>integrationengine.engineheatertrigger</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>A Camel Spring Route</name>
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -80,6 +78,5 @@
   	<groupId>se.anviken.integrationengine</groupId>
   	<artifactId>integrationengine</artifactId>
   	<version>0.0.1-SNAPSHOT</version>
-  	<relativePath>/..</relativePath>
   </parent>
 </project>
