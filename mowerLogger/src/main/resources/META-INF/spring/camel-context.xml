@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Configures the Camel Context-->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
     <camelContext id="camelContext-3e700d30-9ec6-4ab4-ac99-032a0d465ab7" xmlns="http://camel.apache.org/schema/spring">
-        <!-- here is a sample which processes the input files
-         (leaving them in place - see the 'noop' flag)
-         then performs content based routing on the message using XPath -->
-        <route id="_route1">
-        <from uri="direct-vm:logMower"/>
-        <log message="testLogMower"/>
+        <route id="engineHeaterTrigger2" streamCache="true">
+            <from id="triggerTimer" uri="timer:timerName?period=30s"/>
+            <to id="RESTTrigger" uri="http4://localhost:8080/EngineHeaterTimer/rest/trigger"/>
+            <choice id="_choice1">
+                <when>
+                    <simple>${body} == true</simple>
+                    <log message="when true2"/>
+                </when>
+                <otherwise>
+                    <log  message="otherwise2"/>
+                </otherwise>
+            </choice>
         </route>
     </camelContext>
 </beans>
