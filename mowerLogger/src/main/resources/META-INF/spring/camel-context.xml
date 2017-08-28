@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
-    <camelContext id="camelContext-3e700d30-9ec6-4ab4-ac99-032a0d465ab7" xmlns="http://camel.apache.org/schema/spring">
-        <route id="engineHeaterTrigger2" streamCache="true">
-            <from id="triggerTimer" uri="timer:timerName?period=30s"/>
-            <to id="RESTTrigger" uri="http4://localhost:8080/EngineHeaterTimer/rest/trigger"/>
-            <choice id="_choice1">
-                <when>
-                    <simple>${body} == true</simple>
-                    <log message="when true2"/>
-                </when>
-                <otherwise>
-                    <log  message="otherwise2"/>
-                </otherwise>
-            </choice>
+    <camelContext id="camelContext-mowerLogger" xmlns="http://camel.apache.org/schema/spring">
+        <route id="logMower-Cron" streamCache="true">
+            <from  uri="timer:timerName?period=60s"/>
+            <to uri="direct-vm:logMower"/>
+        </route>
+        <route id="logMower" streamCache="true">
+            <from  uri="direct-vm:logMower"/>
+            <setHeader headerName="CamelHttpMethod">
+       			 <constant>GET</constant>
+    		</setHeader>
+    		<setHeader headerName="Authorization">
+       			 <constant>Bearer fc4abbda-4eb7-4cb3-9b32-d828ab18e79b</constant>
+    		</setHeader>
+    		<setHeader headerName="Authorization-Provider">
+       			 <constant>husqvarna</constant>
+    		</setHeader>
+            <to uri="https4://amc-api.dss.husqvarnagroup.net/v1/mowers/164604652-164710835/"/>
+ 			<to	 uri="direct-vm:logMowerToDB"/>         
         </route>
     </camelContext>
 </beans>

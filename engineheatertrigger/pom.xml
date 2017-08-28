@@ -3,17 +3,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-  	<groupId>se.anviken.integrationengine</groupId>
-  	<artifactId>integrationengine</artifactId>
-  	<version>0.0.1-SNAPSHOT</version>
+    <groupId>se.anviken.integrationengine</groupId>
+    <artifactId>integrationengine</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>engineheatertrigger</artifactId>
-  <name>A Camel Spring Route</name>
+  <name>engineheatertrigger</name>
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
   <dependencies>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -33,9 +32,22 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-test-spring</artifactId>
+      <version>2.18.1.redhat-000015</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <id>redhat-ga-repository</id>
+      <url>https://maven.repository.redhat.com/ga</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>redhat-ga-repository</id>
+      <url>https://maven.repository.redhat.com/ga</url>
+    </pluginRepository>
+  </pluginRepositories>
   <build>
     <defaultGoal>install</defaultGoal>
     <plugins>
@@ -57,7 +69,7 @@
       <plugin>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-maven-plugin</artifactId>
-        <version>2.18.2</version>
+        <version>2.18.1.redhat-000015</version>
       </plugin>
     </plugins>
   </build>

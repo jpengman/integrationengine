@@ -1,59 +1,69 @@
 package se.anviken.integrationengine.mowerdbservice.model;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * The persistent class for the mower_status database table.
  * 
  */
 @Entity
-@Table(name="mower_status")
-@NamedQuery(name="MowerStatus.findAll", query="SELECT m FROM MowerStatus m")
+@Table(name = "mower_status")
+@NamedQuery(name = "MowerStatus.findAll", query = "SELECT m FROM MowerStatus m")
 public class MowerStatus implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="mower_status_id")
+	@Column(name = "mower_status_id")
 	private int mowerStatusId;
 
-	@Column(name="battery_perrcent")
+	@Column(name = "battery_perrcent")
 	private int batteryPerrcent;
 
 	private String cached_Settings_UUID;
 
-	private Object connected;
-
-	@Column(name="mower_id")
-	private int mowerId;
+	private boolean connected;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="next_start_timestamp")
+	@Column(name = "next_start_timestamp")
 	private Date nextStartTimestamp;
 
-	@Column(name="operating_mode_id")
+	@Column(name = "operating_mode_id")
 	private int operatingModeId;
 
-	@Column(name="show_as_disconnected")
-	private Object showAsDisconnected;
+	@Column(name = "show_as_disconnected")
+	private boolean showAsDisconnected;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="stored_timestamp")
+	@Column(name = "stored_timestamp")
 	private Date storedTimestamp;
 
-	@Column(name="value_found")
-	private Object valueFound;
+	@Column(name = "value_found")
+	private boolean valueFound;
 
-	//uni-directional many-to-one association to RefStartSource
+	// bi-directional many-to-one association to Mower
 	@ManyToOne
-	@JoinColumn(name="next_start_source_id")
+	@JoinColumn(name = "mower_id")
+	private Mower mower;
+
+	// uni-directional many-to-one association to RefStartSource
+	@ManyToOne
+	@JoinColumn(name = "next_start_source_id")
 	private RefStartSource refStartSource;
 
-	//uni-directional many-to-one association to RefStatus
+	// uni-directional many-to-one association to RefStatus
 	@ManyToOne
-	@JoinColumn(name="status_id")
+	@JoinColumn(name = "status_id")
 	private RefStatus refStatus;
 
 	public MowerStatus() {
@@ -83,20 +93,12 @@ public class MowerStatus implements Serializable {
 		this.cached_Settings_UUID = cached_Settings_UUID;
 	}
 
-	public Object getConnected() {
+	public boolean getConnected() {
 		return this.connected;
 	}
 
-	public void setConnected(Object connected) {
+	public void setConnected(boolean connected) {
 		this.connected = connected;
-	}
-
-	public int getMowerId() {
-		return this.mowerId;
-	}
-
-	public void setMowerId(int mowerId) {
-		this.mowerId = mowerId;
 	}
 
 	public Date getNextStartTimestamp() {
@@ -115,11 +117,11 @@ public class MowerStatus implements Serializable {
 		this.operatingModeId = operatingModeId;
 	}
 
-	public Object getShowAsDisconnected() {
+	public boolean getShowAsDisconnected() {
 		return this.showAsDisconnected;
 	}
 
-	public void setShowAsDisconnected(Object showAsDisconnected) {
+	public void setShowAsDisconnected(boolean showAsDisconnected) {
 		this.showAsDisconnected = showAsDisconnected;
 	}
 
@@ -131,12 +133,20 @@ public class MowerStatus implements Serializable {
 		this.storedTimestamp = storedTimestamp;
 	}
 
-	public Object getValueFound() {
+	public boolean getValueFound() {
 		return this.valueFound;
 	}
 
-	public void setValueFound(Object valueFound) {
+	public void setValueFound(boolean valueFound) {
 		this.valueFound = valueFound;
+	}
+
+	public Mower getMower() {
+		return this.mower;
+	}
+
+	public void setMower(Mower mower) {
+		this.mower = mower;
 	}
 
 	public RefStartSource getRefStartSource() {

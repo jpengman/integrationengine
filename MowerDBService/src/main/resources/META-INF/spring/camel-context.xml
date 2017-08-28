@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Configures the Camel Context-->
+<!-- Configures the Camel Context -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
-    <camelContext id="camelContext-5ac931a1-42c9-4769-80e4-e56bc95f9281" xmlns="http://camel.apache.org/schema/spring">
-        <route id="_route1"/>
-    </camelContext>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+	<bean
+		class="se.anviken.integrationengine.mowerdbservice.LogMowerStatusProcessor"
+		id="LogMowerStatusProcessor" />
+	<bean
+		class="se.anviken.integrationengine.mowerdbservice.LogMowerLocationsProcessor"
+		id="LogMowerLocationsProcessor" />
+
+
+	<camelContext id="camelContext-MowerDBService" xmlns="http://camel.apache.org/schema/spring">
+
+		<dataFormats>
+			<json id="json" library="Jackson" useList="true" />
+		</dataFormats>
+
+		<route id="LogMoverToDB-Route" streamCache="true">
+			<from uri="direct-vm:logMowerToDB" />
+			<log message="${body}" />
+			<convertBodyTo type="java.lang.String"/>
+			<to uri="bean:LogMowerStatusProcessor" />
+			<to uri="bean:LogMowerLocationsProcessor" />
+			<log message="${body}" />
+		</route>
+
+	</camelContext>
 </beans>

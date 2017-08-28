@@ -3,12 +3,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
     <camelContext id="camelContext-c8df556c-e995-4188-93e5-685f7e289754" xmlns="http://camel.apache.org/schema/spring">
         <route id="testMowerLoggerRoute">
-           
             <from uri="servlet:testMowerLogger"/>
             <log message="test"/>
             <to uri="direct-vm:logMower" />
-            
-            
         </route>
     </camelContext>
 </beans>

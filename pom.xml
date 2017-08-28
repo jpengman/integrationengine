@@ -29,10 +29,12 @@
 		    <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-core</artifactId>
-    </dependency>
+      <scope>provided</scope>
+		    </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-spring</artifactId>
+      <scope>provided</scope>
     </dependency>
 		
 	</dependencies>
