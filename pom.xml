@@ -22,8 +22,7 @@
 		<module>mowerlogger</module>
 		<module>engineheatertrigger</module>
 		<module>MowerDBService</module>
- 
-		 <module>servlet</module>
+ 		 <module>servlet</module>
   </modules>
 	<dependencies>
 		    <dependency>
