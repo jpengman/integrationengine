@@ -1,19 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
-    <camelContext id="camelContext-engineHeaterTrigger" xmlns="http://camel.apache.org/schema/spring">
-        <route id="engineHeaterTrigger" streamCache="true">
-            <from id="triggerTimer" uri="timer:timerName?period=30s"/>
-            <to id="RESTTrigger" uri="http4://localhost:8080/EngineHeaterTimer/rest/trigger"/>
-            <choice id="_choice1">
-                <when>
-                    <simple>${body} == true</simple>
-                    <log message="when true"/>
-                </when>
-                <otherwise>
-                    <log  message="otherwise"/>
-                </otherwise>
-            </choice>
-        </route>
-    </camelContext>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+	<bean
+		class="se.anviken.integrationengine.engineheatertrigger.ZWaySessionProcessor"
+		id="ZWaySessionProcessor" />
+	<camelContext id="camelContext-engineHeaterTrigger" xmlns="http://camel.apache.org/schema/spring">
+		<route id="engineHeaterTrigger" streamCache="true">
+			<from uri="timer:timerName?period=60s" />
+			<to uri="http4://localhost:8080/EngineHeaterTimer/rest/trigger" />
+			<convertBodyTo type="java.lang.String" />
+			<setHeader headerName="command">
+				<simple>${body}</simple>
+			</setHeader>
+			<setHeader headerName="Accept">
+				<constant>application/json</constant>
+			</setHeader>
+			<setHeader headerName="Content-Type">
+				<constant>application/json</constant>
+			</setHeader>
+			<setBody>
+				<constant>{"form":true,"login":"admin","password":"kardyll","keepme":false,"default_ui":1}</constant>
+			</setBody>
+			<to uri="http4://raspberrypi:8083/ZAutomation/api/v1/login" />
+			<setBody>
+				<simple resultType="java.lang.String">null</simple>
+			</setBody>
+			<to uri="bean:ZWaySessionProcessor" />
+			<log message="${header.command}" />
+			<choice>
+				<when>
+					<simple>${header.command} == "on"</simple>
+					<to
+						uri="http4://raspberrypi:8083/ZAutomation/api/v1/devices/ZWayVDev_zway_6-1-37/command/on" />
+				</when>
+				<otherwise>
+					<to
+						uri="http4://raspberrypi:8083/ZAutomation/api/v1/devices/ZWayVDev_zway_6-1-37/command/off" />
+				</otherwise>
+			</choice>
+		</route>
+	</camelContext>
 </beans>
