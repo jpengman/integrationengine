@@ -12,7 +12,7 @@
        			 <constant>GET</constant>
     		</setHeader>
     		<setHeader headerName="Authorization">
-       			 <constant>Bearer fc4abbda-4eb7-4cb3-9b32-d828ab18e79b</constant>
+       			 <constant>Bearer ae67770e-d260-4419-80ad-7b05b39dd875</constant>
     		</setHeader>
     		<setHeader headerName="Authorization-Provider">
        			 <constant>husqvarna</constant>

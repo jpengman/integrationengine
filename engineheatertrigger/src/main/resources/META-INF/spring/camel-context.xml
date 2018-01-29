@@ -2,16 +2,35 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+	<bean id="bridgePropertyPlaceholder"
+		class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer">
+		<property name="location" value="file:engineheatertrigger.properties" />
+	</bean>
+
 	<bean
 		class="se.anviken.integrationengine.engineheatertrigger.ZWaySessionProcessor"
 		id="ZWaySessionProcessor" />
+		
+	<bean class="se.anviken.integrationengine.engineheatertrigger.StateChecker"
+		id="StateChecker" />
+
 	<camelContext id="camelContext-engineHeaterTrigger" xmlns="http://camel.apache.org/schema/spring">
+		<dataFormats>
+			<json id="jack" library="Jackson"
+				unmarshalTypeName="se.anviken.integrationengine.engineheatertrigger.json.ZwaveObject" />
+		</dataFormats>
+
 		<route id="engineHeaterTrigger" streamCache="true">
-			<from uri="timer:timerName?period=60s" />
+			<from uri="timer:timerName?period=10s" />
 			<to uri="http4://localhost:8080/EngineHeaterTimer/rest/trigger" />
 			<convertBodyTo type="java.lang.String" />
 			<setHeader headerName="command">
 				<simple>${body}</simple>
+			</setHeader>
+			<setHeader headerName="device">
+				<constant>{{device}}</constant>
+				<!-- quibino - ZWayVDev_zway_6-1-37 -->
+				<!-- telldus - ZWayVDev_zway_8-0-37 -->
 			</setHeader>
 			<setHeader headerName="Accept">
 				<constant>application/json</constant>
@@ -28,17 +47,29 @@
 			</setBody>
 			<to uri="bean:ZWaySessionProcessor" />
 			<log message="${header.command}" />
+			<toD
+				uri="http4://raspberrypi:8083/ZAutomation/api/v1/devices/${header.device}" />
+			<unmarshal ref="jack" />
+			<to uri="bean:StateChecker" />
+			<log message="${header.state}" />
 			<choice>
 				<when>
-					<simple>${header.command} == "on"</simple>
-					<to
-						uri="http4://raspberrypi:8083/ZAutomation/api/v1/devices/ZWayVDev_zway_6-1-37/command/on" />
+					<simple>${header.command} == ${header.state}</simple>
+					<log message="Correct state - ${header.state}" />
 				</when>
 				<otherwise>
-					<to
-						uri="http4://raspberrypi:8083/ZAutomation/api/v1/devices/ZWayVDev_zway_6-1-37/command/off" />
+					<setBody>
+						<simple resultType="java.lang.String">null</simple>
+					</setBody>
+					<toD
+						uri="http4://raspberrypi:8083/ZAutomation/api/v1/devices/${header.device}/command/${header.command}" />
+					<log message="${body}" />
 				</otherwise>
 			</choice>
+			<setBody>
+				<simple resultType="java.lang.String">null</simple>
+			</setBody>
+			<to uri="http4://raspberrypi:8083/ZAutomation/api/v1/logout" />
 		</route>
 	</camelContext>
 </beans>
