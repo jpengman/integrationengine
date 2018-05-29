@@ -1,4 +1,4 @@
-package se.anviken.integrationengine.mowerdbservice.model;
+package se.anviken.integrationengine.mowerlogger.model;
 
 import java.io.Serializable;
 
@@ -16,8 +16,14 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "mowers")
 @NamedQueries({ @NamedQuery(name = "Mower.findAll", query = "SELECT m FROM Mower m"),
-		@NamedQuery(name = "Mower.findByRESTServiceId", query = "SELECT m FROM Mower m where  restServiceId = :id") })
+		@NamedQuery(name = "Mower.findByRESTServiceId", query = "SELECT m FROM Mower m where  restServiceId = :RESTServiceId") })
 public class Mower implements Serializable {
+	@Override
+	public String toString() {
+		return "Mower [moverId=" + moverId + ", model=" + model + ", moverName=" + moverName + ", restServiceId="
+				+ restServiceId + "]";
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -37,12 +43,6 @@ public class Mower implements Serializable {
 
 	public int getMoverId() {
 		return this.moverId;
-	}
-
-	@Override
-	public String toString() {
-		return "Mower [moverId=" + moverId + ", model=" + model + ", moverName=" + moverName + ", restServiceId="
-				+ restServiceId + "]";
 	}
 
 	public void setMoverId(int moverId) {

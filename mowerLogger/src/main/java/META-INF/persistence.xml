@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="mowerLogger-persistenceUnit"
+        transaction-type="RESOURCE_LOCAL">
+		<class>se.anviken.integrationengine.mowerlogger.model.Configuration</class>
+        <class>se.anviken.integrationengine.mowerlogger.model.ErrorRef</class>
+		<class>se.anviken.integrationengine.mowerlogger.model.Error</class>
+		<class>se.anviken.integrationengine.mowerlogger.model.Location</class>
+		<class>se.anviken.integrationengine.mowerlogger.model.MowerStatus</class>
+		<class>se.anviken.integrationengine.mowerlogger.model.Mower</class>
+		<class>se.anviken.integrationengine.mowerlogger.model.RefStartSource</class>
+		<class>se.anviken.integrationengine.mowerlogger.model.RefStatus</class>
+		<class>se.anviken.integrationengine.mowerlogger.model.RefStatusType</class>
+		
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+            <property name="hibernate.show_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>
