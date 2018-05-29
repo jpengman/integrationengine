@@ -1,5 +1,7 @@
 package se.anviken.integrationengine.mowerlogger.processor;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import org.apache.camel.Exchange;
@@ -26,7 +28,10 @@ public class SetConfigHeaders extends Headers implements Processor {
 			}
 			if (c.getParameter().equals(TOKEN_EXPIRES)) {
 				exchange.getIn().setHeader(TOKEN_EXPIRES, c.getValue());
+				exchange.getIn().setHeader(TOKEN_IS_INVALID, LocalDateTime
+						.parse(c.getValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isBefore(LocalDateTime.now()));
 			}
 		}
+
 	}
 }

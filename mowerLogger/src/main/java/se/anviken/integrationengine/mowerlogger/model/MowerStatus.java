@@ -61,12 +61,12 @@ public class MowerStatus implements Serializable {
 	// uni-directional many-to-one association to RefStartSource
 	@ManyToOne
 	@JoinColumn(name = "next_start_source_id")
-	private RefStartSource refStartSource;
+	private RefStartSource startSource;
 
 	// uni-directional many-to-one association to RefStatus
 	@ManyToOne
 	@JoinColumn(name = "status_id")
-	private RefStatus refStatus;
+	private RefStatus status;
 
 	public MowerStatus() {
 	}
@@ -152,19 +152,19 @@ public class MowerStatus implements Serializable {
 	}
 
 	public RefStartSource getRefStartSource() {
-		return this.refStartSource;
+		return this.startSource;
 	}
 
 	public void setRefStartSource(RefStartSource refStartSource) {
-		this.refStartSource = refStartSource;
+		this.startSource = refStartSource;
 	}
 
-	public RefStatus getRefStatus() {
-		return this.refStatus;
+	public RefStatus getStatus() {
+		return this.status;
 	}
 
-	public void setRefStatus(RefStatus refStatus) {
-		this.refStatus = refStatus;
+	public void setStatus(RefStatus status) {
+		this.status = status;
 	}
 
 }

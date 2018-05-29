@@ -29,14 +29,13 @@
 	<bean
 		class="se.anviken.integrationengine.mowerlogger.processor.ProcessGetTokenResponse"
 		id="ProcessGetTokenResponse" />
-		<bean
-		class="se.anviken.integrationengine.mowerlogger.processor.UpdateMower"
+	<bean class="se.anviken.integrationengine.mowerlogger.processor.UpdateMower"
 		id="UpdateMower" />
-		<bean
+	<bean
 		class="se.anviken.integrationengine.mowerlogger.processor.CreateMowerStatus"
 		id="CreateMowerStatus" />
-		
-		
+
+
 	<camelContext id="camelContext-mowerLogger" xmlns="http://camel.apache.org/schema/spring">
 		<dataFormats>
 			<json id="GetToken" library="Jackson"
@@ -44,13 +43,38 @@
 			<json id="Mower" library="Jackson"
 				unmarshalTypeName="se.anviken.integrationengine.mowerlogger.json.getmowers.Mower" />
 		</dataFormats>
+		
 		<route id="logMower-Cron">
 			<from uri="timer:timerName?period=60s" />
 			<to uri="direct:loadConfiguration" />
-			<to uri="direct:getToken" />
-			<to uri="direct:storeConfiguration" />
-			<to uri="direct:getMowerStatus" />
+			<choice>
+				<when>
+					<simple>${header.tokenIsInvalid}</simple>
+					<to uri="direct:getToken" />
+					<to uri="direct:storeConfiguration" />
+				</when>
+			</choice>
+			<to uri="direct:getMowers" />
+			<split>
+				<simple>${body}</simple>
+				<to uri="direct:getMowerStatus" />
+				<to uri="direct:storeMowerStatus" />
+			</split>
 		</route>
+	
+		<route id="logMower-loadConfiguration">
+			<from uri="direct:loadConfiguration" />
+			<setBody>
+				<simple resultType="java.lang.String">null</simple>
+			</setBody>
+			<to
+				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration?namedQuery=Configuration.findAll" />
+			<to uri="bean:SetConfigHeaders" />
+			<setHeader headerName="Configuration">
+				<simple>${body}</simple>
+			</setHeader>
+		</route>
+		
 		<route id="logMover-getToken">
 			<from uri="direct:getToken" />
 			<setHeader headerName="CamelHttpMethod">
@@ -64,37 +88,31 @@
 			<to uri="{{husqvarna.get.token.endpoint}}" />
 			<unmarshal ref="GetToken" />
 			<to uri="bean:ProcessGetTokenResponse" />
-			<to uri="log:logmower.getToken?showAll=true" />
 		</route>
-		<route id="logMower-loadConfiguration">
-			<from uri="direct:loadConfiguration" />
-			<to
-				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration?namedQuery=Configuration.findAll" />
-			<to uri="bean:SetConfigHeaders" />
-			<to uri="log:logmower.configuration?showAll=true" />
-		</route>
+
+
+
 		<route id="logMower-storeConfiguration">
 			<from uri="direct:storeConfiguration" />
-			<to
-				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration?namedQuery=Configuration.findToken" />
-			<to uri="bean:UpdateConfiguration" />
-			<to
-				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration" />
+			<setBody>
+				<simple>${header.configuration}</simple>
+			</setBody>
+			<split>
+				<simple>${body}</simple>
+				<to uri="bean:UpdateConfiguration" />
+				<to
+					uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration" />
+			</split>
 			<setBody>
 				<simple resultType="java.lang.String">null</simple>
 			</setBody>
-			<to
-				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration?namedQuery=Configuration.findTokenExpires" />
-			<to uri="bean:UpdateConfiguration" />
-			<to
-				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration" />
-			<setBody>
-				<simple resultType="java.lang.String">null</simple>
-			</setBody>
-			<to uri="log:logmower.configuration?showAll=true" />
 		</route>
-		<route id="logMower.getMowerStatus">
-			<from uri="direct:getMowerStatus" />
+
+		<route id="logMower.getMowers">
+			<from uri="direct:getMowers" />
+			<setBody>
+				<simple resultType="java.lang.String">null</simple>
+			</setBody>
 			<setHeader headerName="CamelHttpMethod">
 				<constant>GET</constant>
 			</setHeader>
@@ -105,30 +123,57 @@
 				<constant>husqvarna</constant>
 			</setHeader>
 			<setHeader headerName="CamelHttpUri">
-				<constant>{{husqvarna.get.mower.endpoint}}164604652-164710835</constant>
+				<constant>{{husqvarna.get.mower.endpoint}}</constant>
 			</setHeader>
 			<to uri="http4://husqvarna" />
-			<unmarshal ref="Mower" />
-			<to uri="direct:storeMowerStatus" />
+			<to uri="log:logmower.getMowers?showAll=true" />
 		</route>
-		<route id="logMower.storeMowerStatus">
-			<from uri="direct:storeMowerStatus" />
-			<setHeader headerName="MowerStatusJSON">
-				<simple>${body}</simple>
+
+		<route id="logMower.getMowerStatus">
+			<from uri="direct:getMowerStatus" />
+			<setBody>
+				<simple resultType="java.lang.String">null</simple>
+			</setBody>
+			<setHeader headerName="CamelHttpMethod">
+				<constant>GET</constant>
+			</setHeader>
+			<setHeader headerName="Authorization">
+				<simple>Bearer ${header.token}</simple>
+			</setHeader>
+			<setHeader headerName="Authorization-Provider">
+				<constant>husqvarna</constant>
 			</setHeader>
 			<setHeader headerName="RESTServiceId">
 				<constant>164604652-164710835</constant>
 			</setHeader>
+			<setHeader headerName="CamelHttpUri">
+				<constant>{{husqvarna.get.mower.endpoint}}</constant>
+			</setHeader>
+			<setHeader headerName="CamelHttpUri">
+				<simple>${header.CamelHttpUri}${header.RESTServiceId}</simple>
+			</setHeader>
+			<to uri="http4://husqvarna" />
+			<unmarshal ref="Mower" />
+			<setHeader headerName="MowerStatusJSON">
+				<simple>${body}</simple>
+			</setHeader>
+		</route>
+
+		<route id="logMower.storeMowerStatus">
+			<from uri="direct:storeMowerStatus" />
 			<setBody>
 				<simple resultType="java.lang.String">null</simple>
 			</setBody>
+			<toD
+				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Mower?namedQuery=Mower.findByRESTServiceId&amp;parameters={'RESTServiceId':'${header.RESTServiceId}'}" />
+			<to uri="bean:UpdateMower" />
+			<to uri="jpa://se.anviken.integrationengine.mowerlogger.model.Mower" />
+			
+			<to uri="bean:CreateMowerStatus" />
+			<!-- to uri="log:logmower.storeMowerStatus?showAll=true" /-->
 			<to
-				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Mower?namedQuery=Mower.findByRESTServiceId&amp;parameters={'RESTServiceId':'164604652-164710835'}" />
-			<to uri="bean:UpdateMower"/>
-			<to uri="jpa://se.anviken.integrationengine.mowerlogger.model.Mower"/>
-			<to uri="bean:CreateMowerStatus"/>
-			<to uri="log:logmower.storeMowerStatus?showAll=true" />
-			<to uri="jpa://se.anviken.integrationengine.mowerlogger.model.MowerStatus"/>
+				uri="jpa://se.anviken.integrationengine.mowerlogger.model.MowerStatus" />
+			<log message="MowerStatus stored for ${body.mower.moverName}"/>
 		</route>
 	</camelContext>
 </beans>

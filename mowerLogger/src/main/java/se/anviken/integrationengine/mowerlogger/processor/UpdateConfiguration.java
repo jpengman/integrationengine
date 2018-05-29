@@ -1,7 +1,5 @@
 package se.anviken.integrationengine.mowerlogger.processor;
 
-import java.util.ArrayList;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
@@ -14,20 +12,13 @@ public class UpdateConfiguration extends Headers implements Processor {
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		Message in = exchange.getIn();
-
-		@SuppressWarnings("unchecked")
-		ArrayList<Configuration> configurations = in.getBody(ArrayList.class);
-		Configuration newConfig = null;
-		for (Configuration c : configurations) {
-			if (c.getParameter().equals(TOKEN)) {
-				c.setValue((String) in.getHeader(TOKEN));
-				newConfig = c;
-			}
-			if (c.getParameter().equals(TOKEN_EXPIRES)) {
-				c.setValue((String) in.getHeader(TOKEN_EXPIRES));
-				newConfig = c;
-			}
+		Configuration c = in.getBody(Configuration.class);
+		if (c.getParameter().equals(TOKEN)) {
+			c.setValue((String) in.getHeader(TOKEN));
 		}
-		in.setBody(newConfig);
+		if (c.getParameter().equals(TOKEN_EXPIRES)) {
+			c.setValue((String) in.getHeader(TOKEN_EXPIRES));
+		}
+		in.setBody(c);
 	}
 }

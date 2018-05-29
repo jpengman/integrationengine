@@ -16,7 +16,6 @@ public class MappingUtil {
 		ms.setBatteryPerrcent(s.getBatteryPercent());
 		ms.setCached_Settings_UUID(s.getCachedSettingsUUID());
 		ms.setConnected(s.getConnected());
-		// TODO ms.setMowerStatusId(s.get);
 		ms.setNextStartTimestamp(new Date(s.getNextStartTimestamp()));
 		// TODO ms.setOperatingModeId(operatingModeId);
 		// TODO ms.setRefStartSource(refStartSource);
