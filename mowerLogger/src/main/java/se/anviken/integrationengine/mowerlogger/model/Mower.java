@@ -20,20 +20,20 @@ import javax.persistence.Table;
 public class Mower implements Serializable {
 	@Override
 	public String toString() {
-		return "Mower [moverId=" + moverId + ", model=" + model + ", moverName=" + moverName + ", restServiceId="
+		return "Mower [moverId=" + mowerId + ", model=" + model + ", moverName=" + mowerName + ", restServiceId="
 				+ restServiceId + "]";
 	}
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "mover_id")
-	private int moverId;
+	@Column(name = "mower_id")
+	private int mowerId;
 
 	private String model;
 
-	@Column(name = "mover_name")
-	private String moverName;
+	@Column(name = "mower_name")
+	private String mowerName;
 
 	@Column(name = "rest_service_id")
 	private String restServiceId;
@@ -41,12 +41,12 @@ public class Mower implements Serializable {
 	public Mower() {
 	}
 
-	public int getMoverId() {
-		return this.moverId;
+	public int getMowerId() {
+		return this.mowerId;
 	}
 
-	public void setMoverId(int moverId) {
-		this.moverId = moverId;
+	public void setMowerId(int moverId) {
+		this.mowerId = moverId;
 	}
 
 	public String getModel() {
@@ -57,12 +57,12 @@ public class Mower implements Serializable {
 		this.model = model;
 	}
 
-	public String getMoverName() {
-		return this.moverName;
+	public String getMowerName() {
+		return this.mowerName;
 	}
 
-	public void setMoverName(String moverName) {
-		this.moverName = moverName;
+	public void setMowerName(String mowerName) {
+		this.mowerName = mowerName;
 	}
 
 	public String getRestServiceId() {

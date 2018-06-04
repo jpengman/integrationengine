@@ -13,8 +13,6 @@ public class CreateGetTokenRequest extends Headers implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
-		// {"data":{"attributes":{"password":
-		// "${header.password}","username":"${header.username}"},"type":"token"}}
 		Message in = exchange.getIn();
 		GetToken request = new GetToken();
 		Data data = new Data();

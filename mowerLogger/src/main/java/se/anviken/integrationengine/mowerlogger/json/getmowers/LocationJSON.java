@@ -16,14 +16,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "longitude",
     "gpsStatus"
 })
-public class Location {
+public class LocationJSON {
 
     @JsonProperty("latitude")
     private Double latitude;
     @JsonProperty("longitude")
     private Double longitude;
     @JsonProperty("gpsStatus")
-    private Object gpsStatus;
+    private String gpsStatus;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -48,12 +48,12 @@ public class Location {
     }
 
     @JsonProperty("gpsStatus")
-    public Object getGpsStatus() {
+    public String getGpsStatus() {
         return gpsStatus;
     }
 
     @JsonProperty("gpsStatus")
-    public void setGpsStatus(Object gpsStatus) {
+    public void setGpsStatus(String gpsStatus) {
         this.gpsStatus = gpsStatus;
     }
 

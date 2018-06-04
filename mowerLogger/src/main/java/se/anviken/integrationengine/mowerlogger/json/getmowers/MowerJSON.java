@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "id", "name", "model", "valueFound", "status", "centralPoint" })
-public class Mower {
+public class MowerJSON {
 
 	@JsonProperty("id")
 	private String id;

@@ -43,7 +43,7 @@ public class Status {
 	@JsonProperty("cachedSettingsUUID")
 	private String cachedSettingsUUID;
 	@JsonProperty("lastLocations")
-	private List<LastLocation> lastLocations = null;
+	private List<LocationJSON> lastLocations = null;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -168,12 +168,12 @@ public class Status {
 	}
 
 	@JsonProperty("lastLocations")
-	public List<LastLocation> getLastLocations() {
+	public List<LocationJSON> getLastLocations() {
 		return lastLocations;
 	}
 
 	@JsonProperty("lastLocations")
-	public void setLastLocations(List<LastLocation> lastLocations) {
+	public void setLastLocations(List<LocationJSON> lastLocations) {
 		this.lastLocations = lastLocations;
 	}
 
