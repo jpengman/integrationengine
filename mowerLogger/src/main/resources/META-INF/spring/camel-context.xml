@@ -13,14 +13,14 @@
 		<property name="dataSource" ref="moverDataSource" />
 		<property name="persistenceUnitName" value="mowerLogger-persistenceUnit" />
 	</bean>
-	
+
 	<bean
 		class="se.anviken.integrationengine.mowerlogger.processor.SetConfigHeaders"
 		id="SetConfigHeaders" />
 	<bean
 		class="se.anviken.integrationengine.mowerlogger.processor.UpdateConfiguration"
 		id="UpdateConfiguration" />
-	
+
 	<bean class="se.anviken.integrationengine.mowerlogger.processor.UpdateMower"
 		id="UpdateMower" />
 	<bean
@@ -30,46 +30,48 @@
 		class="se.anviken.integrationengine.mowerlogger.processor.LocationCalculator"
 		id="LocationCalculator" />
 	<camelContext id="camelContext-mowerLogger" xmlns="http://camel.apache.org/schema/spring">
-		
 		<route id="logMower-Cron">
 			<from uri="timer:timerName?period=60s" />
-			<to  uri="direct:loadConfiguration" />
-			<choice >
-				<when >
+			<to uri="direct:loadConfiguration" />
+			<choice>
+				<when>
 					<simple>${header.tokenIsInvalid}</simple>
-					<to  uri="direct:getToken" />
+					<to uri="direct:getToken" />
 					<to uri="direct:storeConfiguration" />
 				</when>
 			</choice>
-			<to  uri="direct-vm:getMowers" />
-			<split >
+			<to uri="direct-vm:getMowers" />
+			<split>
 				<simple>${body}</simple>
-				<to  uri="direct-vm:getMowerStatus" />
-				<to  uri="direct:storeMowerStatus" />
+				<to uri="direct-vm:getMowerStatus" />
+				<to uri="direct:storeMowerStatus" />
 			</split>
 		</route>
 		<route id="logMower-loadConfiguration">
-			<from  uri="direct:loadConfiguration" />
-			<to  uri="direct-vm:setNullBody" />
+			<from uri="direct:loadConfiguration" />
+			<to uri="direct-vm:setNullBody" />
 			<to
 				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration?namedQuery=Configuration.findAll" />
-			<to id="_to9" uri="bean:SetConfigHeaders" />
-			<setHeader headerName="Configuration" >
+			<to uri="bean:SetConfigHeaders" />
+			<setHeader headerName="Configuration">
 				<simple>${body}</simple>
 			</setHeader>
 		</route>
-		
+
 		<route id="logMower-storeConfiguration">
-			<from  uri="direct:storeConfiguration" />
-			<to  uri="direct-vm:setNullBody" />
+			<from uri="direct:storeConfiguration" />
+			<setBody>
+				<simple>${header.Configuration}</simple>
+			</setBody>
 			<split>
 				<simple>${body}</simple>
 				<to uri="bean:UpdateConfiguration" />
-				<to uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration" />
+				<to
+					uri="jpa://se.anviken.integrationengine.mowerlogger.model.Configuration" />
 			</split>
 		</route>
-		
-		
+
+
 		<route id="logMower.storeMowerStatus">
 			<from uri="direct:storeMowerStatus" />
 			<to uri="direct:getStatus" />
@@ -77,30 +79,31 @@
 			<toD
 				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Mower?namedQuery=Mower.findByRESTServiceId&amp;parameters={'RESTServiceId':'${header.RESTServiceId}'}" />
 			<to uri="bean:UpdateMower" />
-			<to 
-				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Mower" />
-			<setHeader headerName="mower" id="_setHeader14">
+			<to uri="jpa://se.anviken.integrationengine.mowerlogger.model.Mower" />
+			<setHeader headerName="mower">
 				<simple>${body}</simple>
 			</setHeader>
 			<to uri="direct:StoreLocations" />
 			<to uri="bean:ObjectFactory?method=createMowerStatus" />
-			<to uri="jpa://se.anviken.integrationengine.mowerlogger.model.MowerStatus" />
-			<log  message="MowerStatus stored for ${body.mower.mowerName}" />
+			<to
+				uri="jpa://se.anviken.integrationengine.mowerlogger.model.MowerStatus" />
+			<log message="MowerStatus stored for ${body.mower.mowerName}" />
 		</route>
-		
+
 		<route id="logMower.getStatus">
-			<from  uri="direct:getStatus" />
-			<to  uri="direct-vm:setNullBody" />
-			<toD 			uri="jpa://se.anviken.integrationengine.mowerlogger.model.RefStatus?namedQuery=RefStatus.findByStatusCode&amp;parameters={'statusCode':'${header.MowerStatusJSON.status.mowerStatus}'}" />
-			<choice >
-				<when >
+			<from uri="direct:getStatus" />
+			<to uri="direct-vm:setNullBody" />
+			<toD
+				uri="jpa://se.anviken.integrationengine.mowerlogger.model.RefStatus?namedQuery=RefStatus.findByStatusCode&amp;parameters={'statusCode':'${header.MowerStatusJSON.status.mowerStatus}'}" />
+			<choice>
+				<when>
 					<simple>${body.size} == 0 </simple>
-					<to  uri="bean:ObjectFactory?method=createRefStatus" />
+					<to uri="bean:ObjectFactory?method=createRefStatus" />
 					<to
 						uri="jpa://se.anviken.integrationengine.mowerlogger.model.RefStatus" />
 				</when>
-				<otherwise >
-					<setBody >
+				<otherwise>
+					<setBody>
 						<simple>${body.get(0)}</simple>
 					</setBody>
 				</otherwise>
@@ -109,20 +112,19 @@
 				<simple>${body}</simple>
 			</setHeader>
 		</route>
-		
+
 		<route id="logMower.StoreLocations">
-			<from  uri="direct:StoreLocations" />
-			<toD 
+			<from uri="direct:StoreLocations" />
+			<toD
 				uri="jpa://se.anviken.integrationengine.mowerlogger.model.Location?namedQuery=Location.findByMower&amp;parameters={'RESTServiceId':'${header.RESTServiceId}'}&amp;maximumResults=50" />
-			<to  uri="bean:LocationCalculator" />
-			<split >
+			<to uri="bean:LocationCalculator" />
+			<split>
 				<simple>${body}</simple>
 				<log message="${body.locationId}" />
-				<to 
-					uri="jpa://se.anviken.integrationengine.mowerlogger.model.Location" />
+				<to uri="jpa://se.anviken.integrationengine.mowerlogger.model.Location" />
 			</split>
 		</route>
-		
+
 		<route id="logMower.setNullBody">
 			<from uri="direct-vm:setNullBody" />
 			<setBody>
